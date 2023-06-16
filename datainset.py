@@ -110,5 +110,5 @@ finally:
     conn.commit()
 
     print("Record updated successfully")
-finally:
-    conn.close()
+finally:fdfas
+    conn.close()dfadf
