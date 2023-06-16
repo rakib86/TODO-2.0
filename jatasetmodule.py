@@ -63,18 +63,7 @@ finally:
 finally:
     
 
-    print("Record updated successfully")
-finally:
-    conn.close()
-    try:
-    with conn.cursor() as cursor:
-        # Create a new record
-        sql = "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"
-        cursor.execute(sql, ('john@example.com', 'mypassword'))
-
-    # Commit changes
-    conn.commit()
-
+    
     print("Record inserted successfully")
 finally:
     conn.close()
