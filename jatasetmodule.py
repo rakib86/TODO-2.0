@@ -64,6 +64,15 @@ finally:
     
 
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
     print("Record inserted successfully")
 finally:
     conn.close()
