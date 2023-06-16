@@ -61,15 +61,7 @@ finally:
 
     print("Record deleted successfully")
 finally:
-    conn.close()
-    try:
-    with conn.cursor() as cursor:
-        # Update a record
-        sql = "UPDATE `users` SET `password`=%s WHERE `email`=%s"
-        cursor.execute(sql, ('newpassword', 'john@example.com'))
-
-    # Commit changes
-    conn.commit()
+    
 
     print("Record updated successfully")
 finally:
