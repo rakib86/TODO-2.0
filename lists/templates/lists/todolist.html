@@ -1,0 +1,678 @@
+{% extends "base.html" %} {% load static %} {% block js %}
+<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+<script src="{% static 'lists/js/lists.js' %}"></script>
+<script>
+  function openPopup(url) {
+    var popupWidth = 600;
+    var popupHeight = 400;
+    var left = (window.innerWidth - popupWidth) / 2;
+    var top = (window.innerHeight - popupHeight) / 2;
+    var popupFeatures = `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,location=no`;
+    var popup = window.open(url, "popupWindow", popupFeatures);
+    if (window.focus) {
+      popup.focus();
+    }
+    return false;
+  }
+
+  function closePopup() {
+    window.close();
+  }
+
+  function searchApproxTime() {
+    var inputValue = document.getElementById("description").value;
+    var prefix = "how much time needed to complete";
+    var searchQuery = prefix + " " + inputValue;
+    var url =
+      "https://www.bing.com/search?q=" + encodeURIComponent(searchQuery);
+    openPopup(url);
+  }
+
+  function searchFormatText() {
+    var inputValue = document.getElementById("description").value;
+    var prefix = "correct this text grammer and summerize it:'";
+    var searchQuery = prefix + " " + inputValue;
+    var url =
+      "https://www.bing.com/search?q=" + encodeURIComponent(searchQuery) + "'";
+    openPopup(url);
+  }
+
+
+  // Initialize an array to store the website shortcuts
+let shortcuts = [];
+
+// Function to show the form for adding a new shortcut
+function showForm() {
+  document.getElementById('form-container').style.display = 'block';
+}
+
+// Function to hide the form
+function hideForm() {
+  document.getElementById('form-container').style.display = 'none';
+}
+
+// Function to add a new shortcut
+function addShortcut() {
+  // Get the form values
+  const url = document.getElementById('website-url').value;
+  const title = document.getElementById('website-title').value;
+  const icon = document.getElementById('website-icon').files[0];
+
+  // Create a new object to represent the shortcut
+  const shortcut = {
+    url,
+    title,
+    icon
+  };
+
+  // Add the new shortcut to the array
+  shortcuts.unshift(shortcut);
+
+  // Clear the form
+  document.getElementById('website-url').value = '';
+  document.getElementById('website-title').value = '';
+  document.getElementById('website-icon').value = '';
+
+  // Update the shortcut container with the new shortcut
+  updateShortcutContainer();
+
+  // Hide the form
+  hideForm();
+}
+
+// Function to update the shortcut container with the latest shortcuts
+function updateShortcutContainer() {
+  // Get the shortcut container element
+  const container = document.getElementById('shortcut-container');
+
+  // Clear the existing shortcuts
+  container.innerHTML = '';
+
+  // Loop through the shortcuts and add each one to the container
+  shortcuts.forEach((shortcut) => {
+    // Create a new shortcut element
+    const shortcutElem = document.createElement('div');
+    shortcutElem.classList.add('shortcut');
+    shortcutElem.onclick = () => {
+      // Redirect to the website URL when the shortcut is clicked
+      window.location.href = shortcut.url;
+    };
+
+    // Create an image element for the shortcut icon
+    const iconElem = document.createElement('img');
+    iconElem.src = URL.createObjectURL(shortcut.icon);
+    iconElem.alt = shortcut.title;
+    shortcutElem.appendChild(iconElem);
+
+    // Create a span element for the shortcut title
+    const titleElem = document.createElement('span');
+    titleElem.textContent = shortcut.title;
+    shortcutElem.appendChild(titleElem);
+
+    // Add the shortcut element to the container
+    container.appendChild(shortcutElem);
+  });
+}
+
+// Add an event listener to the form submit button
+document.querySelector('form').addEventListener('submit', (event) => {
+  event.preventDefault(); // Prevent the default form submission
+  addShortcut(); // Add the new shortcut
+});
+
+// Update the shortcut container with any existing shortcuts
+updateShortcutContainer();
+
+
+
+</script>
+{% endblock %} {% block body %}
+<style>
+  .header {
+    background-color: #f5f5f5;
+    margin-top: 40px;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-shadow: 0px 20px 40px 19px rgba(130, 132, 151, 0.25);
+    border-radius: 38px;
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  form {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  input[type="submit"] {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .open-todos,
+  .finished-todos {
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+  }
+
+  .docs-header {
+    font-size: 18px;
+    font-family: "roboto", sans-serif;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  ul {
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  li {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    color: #555;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  li input[type="checkbox"] {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    -webkit-appearance: none;
+    margin-top: 15px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  li input[type="checkbox"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  li input[type="checkbox"] + span {
+    font-size: 16px;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+  }
+
+  li input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: #888;
+  }
+
+  .popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+  }
+
+  .popup-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .popup-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .popup-close {
+    cursor: pointer;
+    font-size: 20px;
+    color: #999;
+  }
+
+  .popup-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+
+
+  #shortcut-adder {
+  
+  }
+  .plus-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background-color: #febb12;
+    color: black;
+    font-size: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin: 10px 10px;
+  }
+  #form-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 10px #ccc;
+    z-index: 999;
+  }
+  #form-container label,
+  #form-container input,
+  #form-container button {
+    display: block;
+    margin-bottom: 10px;
+  }
+  #form-container input,
+  #form-container button {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  #shortcut-container {
+    display: flex;
+    flex-wrap: wrap;
+  
+  }
+  .shortcut {
+    display: flex;
+    align-items: center;
+    width: auto;
+    color: white;
+    height: 50px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+  
+    background: #000000;
+    box-shadow: 0px 4px 26px 6px rgba(146, 146, 152, 0.25);
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  
+  .shortcut img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+  }
+  .shortcut span {
+    flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+
+
+
+  
+.performance {
+  grid-area: performance;
+  margin-top: 20px;
+  margin-left: 65%;
+  background-color: black;
+  height: 100%;
+  width: 40%;
+  border-radius: 25px;
+  padding: 20px 10px;
+}
+
+#uncompleted-task {
+  font-family: "Quicksand";
+  font-size: 20px;
+  margin: 1% 0;
+  font-weight: 700;
+}
+
+.task-management {
+  background: #ffffff;
+  border: 1px solid #fcc419;
+  box-shadow: 0px 4px 35px rgba(0, 0, 0, 0.25);
+  border-radius: 25px;
+  height: 50%;
+  padding: 30px;
+}
+
+.task-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.performance-chart {
+  display: flex;
+  flex-flow: row nowrap;
+}
+.performance-chart .single-chart {
+  width: 60%;
+  justify-content: space-around;
+}
+.performance-chart .circular-chart {
+  display: block;
+  margin: 10px auto;
+  max-width: 80%;
+  max-height: 250px;
+}
+.performance-chart .circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+.performance-chart .circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+.performance-chart .circular-chart.orange .circle {
+  stroke: #ff9f00;
+}
+.performance-chart .percentage {
+  fill: #ff9f00;
+  font-family: sans-serif;
+  font-size: 0.5em;
+  text-anchor: middle;
+}
+
+.performance-info {
+  display: flex;
+  flex-direction: column;
+  transition: all 0.8s ease-in-out;
+  align-items: center;
+  margin-top: 20px;
+  margin-right: 20px;
+}
+.performance-info #performance-info-title {
+  font-family: "Quicksand";
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: white;
+}
+.performance-info ul {
+  color: #fcc419;
+}
+
+
+</style>
+
+
+<div class="shortcutadd">
+  <div id="shortcut-adder">
+    <div class="plus-icon" onclick="showForm()">
+      <i class="fa fa-plus" style="font-weight: bold; font-family: 'roboto', san-sarif;">+</i>
+    </div>
+    <div id="form-container">
+      <form>
+        <label for="website-url">Web Address:</label>
+        <input type="url" id="website-url" name="website-url" required />
+        <label for="website-title">Website Title:</label>
+        <input
+          type="text"
+          id="website-title"
+          name="website-title"
+          required
+        />
+        <label for="website-icon">Upload Icon:</label>
+        <input
+          type="file"
+          id="website-icon"
+          name="website-icon"
+          accept="image/*"
+          required
+        />
+        <button type="submit" onclick="addShortcut()">Add</button>
+        <button type="button" onclick="hideForm()">Cancel</button>
+      </form>
+    </div>
+    <div id="shortcut-container">
+      <!-- Existing shortcuts will b
+      e added here -->
+    </div>
+  </div>
+</div>
+
+
+<div class="performance">
+  <div class="performance-chart">
+    <div class="single-chart">
+      <svg viewBox="0 0 36 36" class="circular-chart orange">
+        <path
+          class="circle-bg"
+          d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+        />
+        <path
+          class="circle"
+          stroke-dasharray="30, 100"
+          d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+        />
+        <text x="18" y="20.35" class="percentage">+30%</text>
+      </svg>
+    </div>
+    <div class="performance-info">
+      <p id="performance-info-title">Performance</p>
+      <ul>
+        <li>Task Completed: 10</li>
+        <li>Task Uncompleted: 5</li>
+        <li>Task Failed: 2</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<section class="header">
+  <div class="row">
+    <div class="three columns value-prop"></div>
+    <div class="noooo">
+      <div class="title">{{todolist.title}}</div>
+      <form action="{% url 'lists:add_todo' todolist.id %}" method="post" id="todoForm">
+        {% csrf_token %}
+        <input
+          type="text"
+          style="
+            margin-right: 10px;
+            width: 100%;
+            height: 58px;
+            background: rgba(252, 196, 25, 0.17);
+            border: 2px solid rgba(0, 0, 0, 0.23);
+            border-radius: 18px;
+          "
+          id="description"
+          name="description"
+          class="u-full-width"
+          placeholder="Enter your todo"
+        />
+      
+        <input
+          type="button"
+          value="Approx Time ⌚"
+          onclick="searchApproxTime()"
+          style="
+            background: #000000;
+            border: 3px solid #fcc419;
+            border-radius: 18px;
+            color: #fcc419;
+            height: 60px;
+            font-size: 15px;
+            font-weight: bold;
+            margin-right: 5px;
+          "
+        />
+        <input
+          type="button"
+          value="Format🐋"
+          onclick="searchFormatText()"
+          style="
+            background: #000000;
+            border: 3px solid #fcc419;
+            border-radius: 18px;
+            color: #fcc419;
+            height: 60px;
+            font-size: 15px;
+            font-weight: bold;
+            margin-right: 5px;
+          "
+        />
+        <input
+          type="submit"
+          value="Submit"
+          style="
+            background: rgba(252, 196, 25, 0.17);
+            border: 3px solid rgba(0, 0, 0, 0.28);
+            border-radius: 18px;
+            color: black;
+            text-align: center;
+            font-size: 16px;
+            height: 60px;
+            font-weight: bold;
+            line-height: 24px;
+            font-size: 15px;
+            font-weight: bold;
+          "
+        />
+      </form>
+       
+    </div>
+    <div class="row">
+      <div class="one-half column open-todos">
+        <h6 class="docs-header open-todos">{{ todolist.count_open }} open</h6>
+        <ul>
+          {% for todo in todolist.todos.all %} {% if not todo.is_finished %}
+          <li>
+            <input type="checkbox" id="checkbox" data-todo-id="{{ todo.id }}" />
+            <span>{{ todo.description }}</span>
+          </li>
+          {% endif %} {% endfor %}
+        </ul>
+      </div>
+      <div class="one-half column finished-todos">
+        <h6 class="docs-header finished-todos">
+          {{ todolist.count_finished }} finished
+        </h6>
+        <ul>
+          {% for todo in todolist.todos.all %} {% if todo.is_finished %}
+          <li>
+            <input
+              type="checkbox"
+              id="checkbox"
+              data-todo-id="{{ todo.id }}"
+              checked="checked"
+            />
+            <span>{{ todo.description }}</span>
+          </li>
+          {% endif %} {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="popup" id="popup" style="display: none">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-title">Popup Title</div>
+      <div class="popup-close" onclick="closePopup()">X</div>
+    </div>
+    <div class="popup-body">
+      <!-- Popup Content Here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  function openPopup(url) {
+    var popup = document.getElementById("popup");
+    var popupContent = popup.querySelector(".popup-content");
+    var popupBody = popup.querySelector(".popup-body");
+
+    popupBody.innerHTML =
+      '<iframe src="' +
+      url +
+      '" style="width: 100%; height: 100%; border: none;"></iframe>';
+    popup.style.display = "block";
+
+    var closeButton = popup.querySelector(".popup-close");
+    closeButton.onclick = closePopup;
+
+    // Adjust the size and position of the popup
+    var popupWidth = 600;
+    var popupHeight = 400;
+    var left = (window.innerWidth - popupWidth) / 2;
+    var top = (window.innerHeight - popupHeight) / 2;
+    popupContent.style.width = popupWidth + "px";
+    popupContent.style.height = popupHeight + "px";
+    popupContent.style.left = left + "px";
+    popupContent.style.top = top + "px";
+  }
+
+  function closePopup() {
+    var popup = document.getElementById("popup");
+    popup.style.display = "none";
+  }
+</script>
+{% endblock %}
