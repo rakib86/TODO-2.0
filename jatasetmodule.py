@@ -104,4 +104,16 @@ finally:
     with conn.cursor() as cursor:
         # Update a record
         sql = "UPDATE `users` SET `password`=%s WHERE `email`=%s"
+        
+        
+        
+    finally:
+    conn.close()
+    try:
+    with conn.cursor() as cursor:
+       
+    try:
+    with conn.cursor() as cursor:
+        # Update a record
+        sql = "UPDATE `users` SET `password`=%s WHERE `email`=%s"
    
