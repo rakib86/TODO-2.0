@@ -56,17 +56,6 @@ finally:
         sql = "DELETE FROM `users` WHERE `email`=%s"
         cursor.execute(sql, ('john@example.com',))
 
-    # Commit changes
-    conn.commit()
-
-    print("Record deleted successfully")
-finally:
-    
-
-    
-    
-    
-    
     
     
     
